@@ -8,8 +8,6 @@ var salt = bcrypt.genSaltSync(10);
 var survey = require('../lib/survey');
 var questions = require('../lib/questions');
 var twilio = require('twilio');
-var client = twilio(nconf.get('TWILIO_SID'), nconf.get('TWILIO_AUTH_TOKEN'));
-
 
 function isAuthenticated(req, res, next) {
   if(req.session.isAuthenticated) {
@@ -94,7 +92,7 @@ module.exports = function routes(app){
     if(!req.body.Body) {
       return next(new Error('No SMS body'));
     }
-    
+
     survey.handleIncoming(app, req, res);
   });
 
