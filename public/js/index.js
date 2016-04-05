@@ -1,18 +1,7 @@
 var $ = require('jquery');
 
-function getTimestamp(){
-  var now = new Date();
-  var timestamp = now.getFullYear() + '-' +
-                  ('0' + (now.getMonth()+1)).slice(-2) + '-' +
-                  ('0' + now.getDate()).slice(-2) + ' ' +
-                  ('0' + now.getHours()).slice(-2) + ':' +
-                  ('0' + now.getMinutes()).slice(-2) + ':' +
-                  ('0' + now.getSeconds()).slice(-2);
-  return timestamp;
-}
-
 function getNextQuestion(from, body){
-  $.getJSON('/incoming', {
+  $.post('/incoming', {
     From: from,
     To: '+14439918747',
     test: 'true',
@@ -69,10 +58,10 @@ $('#testSMS').submit(function() {
   $.post('/api/sms-test', {dst: $('[name="dst"]', this).val()}, function(data) {
     console.log(data);
 
-    if(data && data.status === 'success') {
-      $('#smsResults').removeClass().addClass('alert alert-success').text('Success: ' + data.body);
+    if(data && data.errorCode) {
+      $('#smsResults').removeClass().addClass('alert alert-danger').text('Error: ' + data.body + ' ' + data.errorCode + ' ' + data.errorMessage);
     } else {
-      $('#smsResults').removeClass().addClass('alert alert-danger').text('Error: ' + data.body);
+      $('#smsResults').removeClass().addClass('alert alert-success').text('Success: ' + data.body);
     }
   });
   return false;

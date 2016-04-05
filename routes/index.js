@@ -194,7 +194,7 @@ module.exports = function routes(app){
   });
 
 
-  app.get('/incoming', twilio.webhook(), function(req, res, next) {
+  app.post('/incoming', twilio.webhook(), function(req, res, next) {
     if(!req.params.Body) {
       return next(new Error('No SMS body'));
     }
