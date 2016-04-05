@@ -1,0 +1,8 @@
+config.json
+node_modules
+
+#compiled js files
+public/dest
+
+#compiled css files
+public/css

@@ -1,0 +1,16 @@
+extends layout
+
+block content
+  .row
+    .col-md-6.col-md-offset-3
+      form#signup.well(action="/users/create", method="POST")
+        h2 Create New User for Text Your Commute
+        - if (typeof(error) != 'undefined')
+          .alert.alert-danger= error
+        .form-group
+          input.form-control(type="text", placeholder="username", name="username")
+        .form-group
+          input.form-control(type="password", placeholder="password", name="password")
+        .form-group
+          input.form-control(type="password", placeholder="password again", name="passwordAgain")
+        input.btn.btn-primary(type="submit", value="Add User")

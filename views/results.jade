@@ -1,0 +1,25 @@
+extends layout
+
+block content
+
+  h2 Reuslts
+
+  if results && results.length
+    .export
+      a(href='/downloads/results.csv') Export as .csv file
+
+    table.results.table.table-striped
+      thead
+        tr
+          th.number Number
+          each question, i in questions
+            th(title= questions[i])= "Q" + (i + 1)
+
+      tbody
+      each result in results
+        tr.result
+          td.number= result.src
+          each question, i in questions
+            td= (result.answers[i]) ? result.answers[i].answer : ''
+          td.edit
+            a(href="/results/edit/" + result._id) edit

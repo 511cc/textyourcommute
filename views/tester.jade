@@ -1,0 +1,37 @@
+extends layout
+
+block content
+  .row
+    .col-md-6.col-md-offset-3
+      .well
+        .row
+          .col-md-10.col-md-offset-1
+            h2 Test Survey
+          
+            form#tester.form-horizontal
+              .form-group
+                label Sender Phone Number
+                input.form-control.src(name="src")
+              input.btn.btn-primary(type="submit", value="Start Survey")
+            #questions
+            form#answers.form-horizontal
+              .form-group
+                input.answer.form-control(name="answer")
+              input.btn.btn-primary(type="submit", value="Submit Answer")
+            
+  .row
+    .col-md-6.col-md-offset-3
+      .well
+        .row
+          .col-md-10.col-md-offset-1
+            h2 Test SMS
+          
+            form#testSMS.form-horizontal
+              .form-group
+                label Recipient Phone Number
+                input.form-control.dst(name="dst")
+              input.btn.btn-primary(type="submit", value="Send Test SMS")
+        .row
+          .col-md-10.col-md-offset-1(style="margin-top:20px;")
+            #smsResults.alert.alert-success.hide
+          

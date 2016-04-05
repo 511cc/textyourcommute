@@ -1,0 +1,67 @@
+#content {
+  width: 940px;
+  margin: 0 auto;
+}
+
+.error {
+  color: #b94a48;
+}
+
+.navigation {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.navigation a {
+  padding: 0 4px;
+  font-size: 14px;
+}
+
+.navigation a.current {
+  color: #000;
+  font-weight: bold;
+}
+
+#questions {
+  margin-bottom: 10px;
+}
+
+#questions .question {
+  margin-top: 8px;
+  font-weight: bold;
+}
+
+#answers {
+  display: none;
+}
+
+#answers input[type="submit"] {
+  margin-left: 5px;
+}
+
+h2 {
+  text-transform: capitalize;
+}
+
+.resultsControl {
+  width: 500px;
+  float: left;
+}
+
+.export {
+  float: right;
+  width: 200px;
+  text-align: right;
+}
+
+.results td,
+.results th {
+  max-width: 60px;
+}
+
+.results tr td:first-child,
+.results tr th:first-child,
+.results tr td:nth-child(2),
+.results tr th:nth-child(2) {
+  max-width: 100px;
+}
