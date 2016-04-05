@@ -34,7 +34,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 if(app.get('env') !== 'development') {
   var RedisStore = require('connect-redis')(session),
-      redisURL = url.parse(nconf.get('REDISCLOUD_URL')),
+      redisURL = url.parse(nconf.get('REDIS_URL')),
       store = new RedisStore({
         host: redisURL.hostname,
         port: redisURL.port,
