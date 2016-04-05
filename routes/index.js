@@ -1,5 +1,3 @@
-var models = require('../models/models');
-var async = require('async');
 var _ = require('underscore');
 var moment = require('moment');
 var bcrypt = require('bcrypt');
@@ -8,6 +6,8 @@ var salt = bcrypt.genSaltSync(10);
 var survey = require('../lib/survey');
 var questions = require('../lib/questions');
 var twilio = require('twilio');
+
+var models = require('../models/models');
 
 function isAuthenticated(req, res, next) {
   if(req.session.isAuthenticated) {
@@ -83,7 +83,7 @@ module.exports = function routes(app){
   });
 
 
-  app.get('/tester', isAuthenticated, function(req, res, next) {
+  app.get('/tester', isAuthenticated, function(req, res) {
     res.render('tester');
   });
 
@@ -97,7 +97,7 @@ module.exports = function routes(app){
   });
 
 
-  app.get('/login', function(req, res, next) {
+  app.get('/login', function(req, res) {
     res.render('login', { title: 'Text Your Commute | Login', loggedIn: false });
   });
 
@@ -124,11 +124,11 @@ module.exports = function routes(app){
     });
   });
 
-  app.get('/signup', function(req, res, next) {
+  app.get('/signup', function(req, res) {
     res.render('signup', { title: 'Text Your Commute | Create New User' });
   });
 
-  app.post('/users/create', function(req, res, next) {
+  app.post('/users/create', function(req, res) {
     if(nconf.get('ALLOW_SIGNUP') === 'true' || req.session.isAuthenticated) {
       if(req.body.username && req.body.password){
         if(req.body.password == req.body.passwordAgain){
@@ -163,15 +163,15 @@ module.exports = function routes(app){
         res.writeHead(200, {'Content-Type':'text/csv'});
         var csv = 'Number';
         results[0].answers.forEach((answer, i) => {
-          csv += ",Q" + (i+1);
+          csv += ',Q' + (i+1);
         });
-        csv += "\n";
+        csv += '\n';
         results.forEach((result) => {
           var line = result.answers.map((answer) => {
             return answer.answer;
           });
           line.unshift( result.src );
-          csv += line.join(',') + "\n";
+          csv += line.join(',') + '\n';
         });
         res.write(csv);
         res.end();
@@ -179,7 +179,7 @@ module.exports = function routes(app){
   });
 
 
-  app.get('/api/questions', isAuthenticated, function(req, res, next) {
+  app.get('/api/questions', isAuthenticated, function(req, res) {
     res.json(questions);
   });
 
@@ -204,7 +204,7 @@ module.exports = function routes(app){
   });
 
 
-  app.get('/api/results', isAuthenticated, function(req, res, next) {
+  app.get('/api/results', isAuthenticated, function(req, res) {
     Survey.find((e, results) => {
       res.json(results);
     });

@@ -23,13 +23,6 @@ function bundle() {
 }
 
 
-gulp.task('jshint', function() {
-  return gulp.src('./public/js/**/*.js')
-    .pipe(plugins.jshint())
-    .pipe(plugins.jshint.reporter('default'));
-});
-
-
 gulp.task('scss:lint', function() {
   gulp.src('./public/scss/**/*.scss')
     .pipe(plugins.scssLint());
@@ -60,7 +53,7 @@ gulp.task('css:minify', ['scss:compile'], function() {
 });
 
 
-gulp.task('js:develop', ['jshint'], function() {
+gulp.task('js:develop', function() {
   bundle();
 });
 
