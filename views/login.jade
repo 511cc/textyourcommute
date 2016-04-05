@@ -4,7 +4,7 @@ block content
   .row
     .col-md-6.col-md-offset-3
       form#login.well(action="/sessions/create", method="POST")
-        h2 Login to Text Your Commute
+        h2 Login
         - if (typeof(error) != 'undefined')
           .alert.alert-danger= error
         .form-group

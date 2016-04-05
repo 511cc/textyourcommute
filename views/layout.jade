@@ -14,16 +14,17 @@ html(lang="en")
             span.icon-bar
           a.navbar-brand(href="#") Text Your Commute SMS
         #navbar.navbar-collapse.collapse
-          ul.nav.navbar-nav
-            li
-              a(href="/results/all") Results
-            li
-              a(href="/messageLog") Message Log
-            li
-              a(href="/tester") Test Survey
-          ul.nav.navbar-nav.navbar-right
-            li
-              a(href="/logout") Logout
+          if loggedIn !== false
+            ul.nav.navbar-nav
+              li
+                a(href="/results/all") Results
+              li
+                a(href="/messageLog") Message Log
+              li
+                a(href="/tester") Test Survey
+            ul.nav.navbar-nav.navbar-right
+              li
+                a(href="/logout") Logout
   
     .container
       block content

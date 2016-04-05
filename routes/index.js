@@ -108,7 +108,7 @@ module.exports = function routes(app){
 
 
   app.get('/login', function(req, res, next) {
-    res.render('login', { title: 'Text Your Commute | Login' });
+    res.render('login', { title: 'Text Your Commute | Login', loggedIn: false });
   });
 
 
