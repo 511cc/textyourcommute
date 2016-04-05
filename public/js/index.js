@@ -1,11 +1,11 @@
 var $ = require('jquery');
 
 function getNextQuestion(from, body){
-  $.post('/incoming', {
+  $.post('/api/sms-test', {
     From: from,
     To: '+14439918747',
-    test: 'true',
-    Body: body
+    Body: body,
+    test: true
   }, function(data){
     console.log(data);
     switch(data.status) {
@@ -55,7 +55,10 @@ $('#answers').submit(function() {
 });
 
 $('#testSMS').submit(function() {
-  $.post('/api/sms-test', {dst: $('[name="dst"]', this).val()}, function(data) {
+  $.post('/api/sms-test', {
+    To: $('[name="dst"]', this).val(),
+    Body: 'ping'
+  }, function(data) {
     console.log(data);
 
     if(data && data.errorCode) {

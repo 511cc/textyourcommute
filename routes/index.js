@@ -37,7 +37,7 @@ module.exports = function routes(app){
 
   function getMessageLog(req, res, next) {
     var resultsPerPage = 100;
-    var page = (parseInt(req.params.page, 10)) ? req.params.page : 1;
+    var page = (parseInt(req.body.page, 10)) ? req.body.page : 1;
     Sms
       .find()
       .sort({$natural: -1})
@@ -64,7 +64,7 @@ module.exports = function routes(app){
 
   app.get('/results/edit/:id', isAuthenticated, function(req, res, next) {
     Survey
-      .findOne({_id: req.params.id})
+      .findOne({_id: req.body.id})
       .exec((e, result) => {
         if(e) return next(e);
         res.render('editResult', {result: result, questions: questions.questions, referer: req.header('Referer')});
@@ -78,7 +78,7 @@ module.exports = function routes(app){
         answers.push({number: i, answer: answer});
       }
     });
-    Survey.update({_id: req.params.id}, {$set: { answers: answers }}, {upsert: true}, (e) => {
+    Survey.update({_id: req.body.id}, {$set: { answers: answers }}, {upsert: true}, (e) => {
       if(e) return next(e);
       res.redirect(req.body.referer);
     });
@@ -91,19 +91,11 @@ module.exports = function routes(app){
 
 
   app.post('/api/sms-test', isAuthenticated, function(req, res, next) {
-    if(req.body.dst) {
-      client.sendMessage({
-        to: req.body.dst,
-        from: nconf.get('TWILIO_NUMBER'),
-        body: 'This is a Test'
-      }, (e, response) => {
-        if(e) return next(e);
-
-        console.log(response);
-
-        res.json(response);
-      });
+    if(!req.body.Body) {
+      return next(new Error('No SMS body'));
     }
+    
+    survey.handleIncoming(app, req, res);
   });
 
 
@@ -195,33 +187,22 @@ module.exports = function routes(app){
 
 
   app.post('/incoming', twilio.webhook(), function(req, res, next) {
-    if(!req.params.Body) {
+    if(!req.body.Body) {
       return next(new Error('No SMS body'));
     }
 
-    var message = req.params.Body.toLowerCase();
-
     //Save SMS
     var sms = new Sms({
-      messageSid: req.params.MessageSid,
-      from: req.params.From,
-      to: req.params.To,
-      body: message,
+      messageSid: req.body.MessageSid,
+      from: req.body.From,
+      to: req.body.To,
+      body: req.body.Body,
       direction: 'inbound',
       timestamp: moment().format()
     });
     sms.save();
 
-    //Do ping if ping sent
-    if (message == 'ping') {
-      survey.doPing(app, req, res);
-    } else if (message == 'reset') {
-      survey.resetQuestion(app, req, res);
-    } else if (message == 'reset all') {
-      survey.resetSurvey(app, req, res);
-    } else {
-      survey.doSurvey(app, req, res);
-    }
+    survey.handleIncoming(app, req, res);
   });
 
 
