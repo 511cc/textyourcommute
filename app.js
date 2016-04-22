@@ -27,7 +27,9 @@ app.set('view engine', 'jade');
 
 app.use(logger('combined'));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({extended:false}));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 app.use(cookieParser(nconf.get('SESSION_SECRET')));
 app.use(express.static(path.join(__dirname, 'public')));
 

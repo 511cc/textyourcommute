@@ -186,7 +186,7 @@ module.exports = function routes(app){
   });
 
 
-  app.post('/incoming', twilio.webhook(), function(req, res, next) {
+  app.post('/incoming', twilio.webhook({url: nconf.get('TWILIO_WEBHOOK_URL'),}), function(req, res, next) {
     if(!req.body.Body) {
       return next(new Error('No SMS body'));
     }
