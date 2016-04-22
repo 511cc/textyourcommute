@@ -14,10 +14,18 @@ var Question = new mongoose.Schema({
     answer: String
   }, {strict: true});
 
-var Survey = mongoose.model('survey', new mongoose.Schema({
+var IntroSurvey = mongoose.model('survey', new mongoose.Schema({
     src: { type: String, unique: true, trim: true },
-    neighborhood: { type: String, trim: true, index: true },
+    status: String,
     answers: [Question]
+  }, {strict: true}));
+
+var DailySurvey = mongoose.model('daily_survey', new mongoose.Schema({
+    src: { type: String, unique: true, trim: true },
+    date: Date,
+    commuted: Boolean,
+    amMode: String,
+    pmMode: String
   }, {strict: true}));
 
 var User = mongoose.model('user', new mongoose.Schema({

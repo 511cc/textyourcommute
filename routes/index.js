@@ -1,5 +1,5 @@
 var _ = require('underscore');
-var moment = require('moment');
+var moment = require('moment-timezone');
 var bcrypt = require('bcrypt');
 var nconf = require('nconf');
 var salt = bcrypt.genSaltSync(10);
@@ -93,7 +93,7 @@ module.exports = function routes(app){
       return next(new Error('No SMS body'));
     }
 
-    survey.handleIncoming(app, req, res);
+    survey.handleIncoming(app, req, res, next);
   });
 
 
@@ -160,7 +160,9 @@ module.exports = function routes(app){
       .sort({$natural: -1})
       .exec((e, results) => {
         if(e) return next(e);
+
         res.writeHead(200, {'Content-Type':'text/csv'});
+
         var csv = 'Number';
         results[0].answers.forEach((answer, i) => {
           csv += ',Q' + (i+1);
@@ -200,7 +202,7 @@ module.exports = function routes(app){
     });
     sms.save();
 
-    survey.handleIncoming(app, req, res);
+    survey.handleIncoming(app, req, res, next);
   });
 
 

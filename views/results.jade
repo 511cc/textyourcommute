@@ -21,5 +21,3 @@ block content
           td.number= result.src
           each question, i in questions
             td= (result.answers[i]) ? result.answers[i].answer : ''
-          td.edit
-            a(href="/results/edit/" + result._id) edit
