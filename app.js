@@ -12,7 +12,9 @@ nconf
   .env()
   .file({file:'./config.json'});
 
-var db = require('mongoose').connect(nconf.get('MONGOLAB_URI') || 'mongodb://localhost/textyourcommute');
+var db = require('mongoose').connect(nconf.get('MONGOLAB_URI'));
+
+require('./models/models').setupModels();
 
 var app = express();
 

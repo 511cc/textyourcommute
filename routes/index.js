@@ -1,13 +1,12 @@
-var _ = require('underscore');
-var moment = require('moment-timezone');
-var bcrypt = require('bcrypt');
-var nconf = require('nconf');
-var salt = bcrypt.genSaltSync(10);
-var survey = require('../lib/survey');
-var questions = require('../lib/questions');
-var twilio = require('twilio');
+const _ = require('underscore');
+const moment = require('moment-timezone');
+const bcrypt = require('bcrypt');
+const nconf = require('nconf');
+const salt = bcrypt.genSaltSync(10);
+const twilio = require('twilio');
 
-var models = require('../models/models');
+const survey = require('../lib/survey');
+const questions = require('../lib/questions');
 
 function isAuthenticated(req, res, next) {
   if(req.session.isAuthenticated) {
@@ -181,12 +180,12 @@ module.exports = function routes(app){
   });
 
 
-  app.get('/api/questions', isAuthenticated, function(req, res) {
+  app.get('/api/questions', isAuthenticated, (req, res) => {
     res.json(questions);
   });
 
 
-  app.post('/incoming', twilio.webhook({url: nconf.get('TWILIO_WEBHOOK_URL'),}), function(req, res, next) {
+  app.post('/incoming', twilio.webhook({url: nconf.get('TWILIO_WEBHOOK_URL'),}), (req, res, next) => {
     if(!req.body.Body) {
       return next(new Error('No SMS body'));
     }

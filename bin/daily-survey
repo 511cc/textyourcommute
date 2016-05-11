@@ -1,0 +1,57 @@
+#!/usr/bin/env node
+const async = require('async');
+const debug = require('debug')('textyourcommute');
+const nconf = require('nconf');
+const argv = require('yargs').argv;
+nconf
+  .argv()
+  .env()
+  .file({file:'./config.json'});
+
+const twilio = require('twilio');
+const client = twilio(nconf.get('TWILIO_SID'), nconf.get('TWILIO_AUTH_TOKEN'));
+
+const db = require('mongoose').connect(nconf.get('MONGOLAB_URI'));
+
+require('../models/models').setupModels();
+
+const IntroSurvey = db.model('survey');
+
+const questions = require('../lib/questions');
+
+function sendSMS(to, body, cb) {
+  client.sendMessage({
+    to: to,
+    from: nconf.get('TWILIO_NUMBER'),
+    body: body
+  }, (e, response) => {
+    if(e) {
+      console.error(e);
+    }
+    cb();
+  });
+}
+
+function sendCommuteQuestion(user, cb) {
+  if(argv.type === 'am') {
+    sendSMS(user.src, questions.daily, cb);
+  } else if(argv.type === 'pm') {
+    sendSMS(user.src, questions.dailyMorning, cb);
+  } else {
+    cb();
+  }
+}
+
+IntroSurvey.find({status: 'completed'}, (e, users) => {
+  if(e) return handleError(e);
+
+  async.each(users, sendCommuteQuestion, () => {
+    debug('Complete');
+    process.exit(0);
+  });
+});
+
+function handleError(e) {
+  console.error(e.stack);
+  process.exit(1);
+}
