@@ -22,7 +22,7 @@ exports.setupModels = function() {
   }, {strict: true}));
 
   mongoose.model('daily_survey', new mongoose.Schema({
-    src: { type: String, unique: true, trim: true },
+    src: { type: String, trim: true },
     date: Date,
     commuted: Boolean,
     amMode: String,
