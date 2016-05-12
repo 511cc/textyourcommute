@@ -2,6 +2,7 @@
 const async = require('async');
 const debug = require('debug')('textyourcommute');
 const nconf = require('nconf');
+const moment = require('moment-timezone');
 const argv = require('yargs').argv;
 nconf
   .argv()
@@ -16,6 +17,7 @@ const db = require('mongoose').connect(nconf.get('MONGOLAB_URI'));
 require('../models/models').setupModels();
 
 const IntroSurvey = db.model('survey');
+const DailySurvey = db.model('daily_survey');
 
 const questions = require('../lib/questions');
 
@@ -34,9 +36,22 @@ function sendSMS(to, body, cb) {
 
 function sendCommuteQuestion(user, cb) {
   if(argv.type === 'am') {
-    sendSMS(user.src, questions.daily, cb);
+    const dailySurvey = new DailySurvey({
+      src: user.src,
+      date: moment().tz('America/Los_Angeles').startOf('day')
+    });
+    dailySurvey.save((e) => {
+      if(e) return cb(e);
+
+      // ask if user commuted
+      sendSMS(user.src, questions.daily, cb);
+    });
   } else if(argv.type === 'pm') {
-    sendSMS(user.src, questions.dailyMorning, cb);
+    if(user.commuted) {
+      sendSMS(user.src, questions.dailyEvening, cb);
+    } else {
+      cb();
+    }
   } else {
     cb();
   }
