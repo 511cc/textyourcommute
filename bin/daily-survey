@@ -52,7 +52,7 @@ function sendCommuteQuestion(user, cb) {
     DailySurvey.findOne({src: user.src, date: date}, (e, dailySurvey) => {
       if(e) return cb(e);
 
-      if(dailySurvey && dailySurvey.commuted) {
+      if(dailySurvey && dailySurvey.commuted && dailySurvey.amMode) {
         sendSMS(user.src, questions.dailyEvening, cb);
       } else {
         cb();
