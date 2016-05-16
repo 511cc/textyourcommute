@@ -35,10 +35,12 @@ function sendSMS(to, body, cb) {
 }
 
 function sendCommuteQuestion(user, cb) {
+  const date = moment().tz('America/Los_Angeles').startOf('day');
   if(argv.type === 'am') {
+
     const dailySurvey = new DailySurvey({
       src: user.src,
-      date: moment().tz('America/Los_Angeles').startOf('day')
+      date: date
     });
     dailySurvey.save((e) => {
       if(e) return cb(e);
@@ -47,11 +49,15 @@ function sendCommuteQuestion(user, cb) {
       sendSMS(user.src, questions.daily, cb);
     });
   } else if(argv.type === 'pm') {
-    if(user.commuted) {
-      sendSMS(user.src, questions.dailyEvening, cb);
-    } else {
-      cb();
-    }
+    DailySurvey.findOne({src: user.src, date: date}, (e, dailySurvey) => {
+      if(e) return cb(e);
+
+      if(dailySurvey && dailySurvey.commuted) {
+        sendSMS(user.src, questions.dailyEvening, cb);
+      } else {
+        cb();
+      }
+    });
   } else {
     cb();
   }
