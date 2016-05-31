@@ -1,4 +1,5 @@
 const _ = require('underscore');
+const debug = require('debug')('textyourcommute');
 const moment = require('moment-timezone');
 const bcrypt = require('bcrypt');
 const nconf = require('nconf');
@@ -189,6 +190,8 @@ module.exports = function routes(app){
     if(!req.body.Body) {
       return next(new Error('No SMS body'));
     }
+
+    debug(`Incoming SMS from ${req.body.From}: ${req.body.Body}`);
 
     //Save SMS
     var sms = new Sms({

@@ -22,6 +22,7 @@ const DailySurvey = db.model('daily_survey');
 const questions = require('../lib/questions');
 
 function sendSMS(to, body, cb) {
+  debug(`Sending SMS to ${to}`);
   client.sendMessage({
     to: to,
     from: nconf.get('TWILIO_NUMBER'),
@@ -55,6 +56,7 @@ function sendCommuteQuestion(user, cb) {
       if(dailySurvey && dailySurvey.commuted && dailySurvey.amMode) {
         sendSMS(user.src, questions.dailyEvening, cb);
       } else {
+        debug(`Skipping ${user.src} because commuted=${dailySurvey.commuted} amMode=${dailySurvey.amMode}`);
         cb();
       }
     });
