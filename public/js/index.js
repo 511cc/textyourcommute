@@ -3,7 +3,7 @@ var $ = require('jquery');
 function getNextQuestion(from, body){
   $.post('/api/sms-test', {
     From: from,
-    To: '+14439918747',
+    To: '+19259058747',
     Body: body,
     test: true
   }, function(data){
