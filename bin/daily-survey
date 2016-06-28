@@ -53,7 +53,10 @@ function sendCommuteQuestion(user, cb) {
     DailySurvey.findOne({src: user.src, date: date}, (e, dailySurvey) => {
       if(e) return cb(e);
 
-      if(dailySurvey && dailySurvey.commuted && dailySurvey.amMode) {
+      if(!dailySurvey) {
+        debug(`Skipping ${user.src} becasue no daily_survey found`);
+        cb();
+      } else if(dailySurvey.commuted && dailySurvey.amMode) {
         sendSMS(user.src, questions.dailyEvening, cb);
       } else {
         debug(`Skipping ${user.src} because commuted=${dailySurvey.commuted} amMode=${dailySurvey.amMode}`);
@@ -68,7 +71,10 @@ function sendCommuteQuestion(user, cb) {
 IntroSurvey.find({status: 'completed'}, (e, users) => {
   if(e) return handleError(e);
 
-  async.each(users, sendCommuteQuestion, () => {
+  async.each(users, sendCommuteQuestion, (e) => {
+    if (e) {
+      console.error(e);
+    }
     debug('Complete');
     process.exit(0);
   });
