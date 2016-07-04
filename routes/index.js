@@ -80,6 +80,7 @@ module.exports = function routes(app){
 
     DailySurvey
       .find()
+      .lean()
       .sort({$natural: -1})
       .limit(resultsPerPage)
       .skip((page - 1) * resultsPerPage)
