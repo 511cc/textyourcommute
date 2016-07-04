@@ -11,13 +11,17 @@ block content
     table.results.table.table-striped
       thead
         tr
-          th.number Number
-          each question, i in questions
-            th(title= questions[i])= "Q" + (i + 1)
+          th Number
+          th Date
+          th Commuted?
+          th AM mode
+          th PM mode
 
       tbody
       each result in results
         tr.result
-          td.number= result.src
-          each question, i in questions
-            td= (result.answers[i]) ? result.answers[i].answer : ''
+          td= result.src || ''
+          td= result.date || ''
+          td= result.commuted
+          td= result.amMode || ''
+          td= result.pmMode || ''

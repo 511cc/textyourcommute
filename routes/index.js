@@ -22,6 +22,7 @@ module.exports = function routes(app){
   var Sms = app.set('db').model('sms');
   var User = app.set('db').model('user');
   var Survey = app.set('db').model('survey');
+  var DailySurvey = app.set('db').model('daily_survey');
 
   /* Routes */
 
@@ -35,7 +36,8 @@ module.exports = function routes(app){
 
   function getMessageLog(req, res, next) {
     const resultsPerPage = 100;
-    const page = req.body.page || 1;
+    const page = req.params.page ? parseInt(req.params.page, 10) : 1;
+
     Sms
       .find()
       .sort({$natural: -1})
@@ -45,7 +47,7 @@ module.exports = function routes(app){
         if(e) return next(e);
         Sms.count((e, count) => {
           if(e) return next(e);
-          
+
           res.render('messageLog', {
             results: results,
             page: page,
@@ -56,41 +58,42 @@ module.exports = function routes(app){
       });
   }
 
-  app.get('/results', isAuthenticated, function(req, res, next) {
+  app.get('/users', isAuthenticated, function(req, res, next) {
     Survey
       .find()
       .sort({$natural: -1})
-      .exec((e, results) => {
+      .exec((e, users) => {
         if(e) return next(e);
-        res.render('results', {
-          results: results,
+        res.render('users', {
+          users: users,
           questions: questions.questions
         });
       });
   });
 
-  app.get('/results/edit/:id', isAuthenticated, function(req, res, next) {
-    Survey
-      .findOne({_id: req.body.id})
-      .exec((e, result) => {
+  app.get('/results', isAuthenticated, function(req, res, next) {
+    const resultsPerPage = 100;
+    const page = req.params.page ? parseInt(req.params.page, 10) : 1;
+
+    DailySurvey
+      .find()
+      .sort({$natural: -1})
+      .limit(resultsPerPage)
+      .skip((page - 1) * resultsPerPage)
+      .exec((e, results) => {
         if(e) return next(e);
-        res.render('editResult', {result: result, questions: questions.questions, referer: req.header('Referer')});
+
+        DailySurvey.count((e, count) => {
+          if(e) return next(e);
+          res.render('results', {
+            results: results,
+            page: page,
+            pages: Math.ceil(count / resultsPerPage),
+            resultsPerPage: resultsPerPage
+          });
+        });
       });
   });
-
-  app.post('/api/results/update/:id', isAuthenticated, function(req, res, next) {
-    var answers = [];
-    _.each(req.body, (answer, i) => {
-      if(!isNaN(parseFloat(i))){
-        answers.push({number: i, answer: answer});
-      }
-    });
-    Survey.update({_id: req.body.id}, {$set: { answers: answers }}, {upsert: true}, (e) => {
-      if(e) return next(e);
-      res.redirect(req.body.referer);
-    });
-  });
-
 
   app.get('/tester', isAuthenticated, function(req, res) {
     res.render('tester');
@@ -163,7 +166,7 @@ module.exports = function routes(app){
     }
   });
 
-  app.get('/downloads/results.csv', isAuthenticated, function(req, res, next) {
+  app.get('/downloads/users.csv', isAuthenticated, (req, res, next) => {
     Survey
       .find()
       .sort({$natural: -1})
@@ -182,6 +185,27 @@ module.exports = function routes(app){
             return answer.answer;
           });
           line.unshift( result.src );
+          csv += line.join(',') + '\n';
+        });
+        res.write(csv);
+        res.end();
+      });
+  });
+
+
+  app.get('/downloads/results.csv', isAuthenticated, (req, res, next) => {
+    DailySurvey
+      .find()
+      .sort({$natural: -1})
+      .exec((e, results) => {
+        if(e) return next(e);
+
+        res.writeHead(200, {'Content-Type':'text/csv'});
+
+        let csv = 'Number,Date,Commuted?,AM Mode,PM Mode\n';
+
+        results.forEach((result) => {
+          const line = _.pluck(result, ['src', 'date', 'commuted', 'amMode', 'pmMode']);
           csv += line.join(',') + '\n';
         });
         res.write(csv);
@@ -217,7 +241,7 @@ module.exports = function routes(app){
   });
 
 
-  app.get('/api/results', isAuthenticated, function(req, res) {
+  app.get('/api/users', isAuthenticated, function(req, res) {
     Survey.find((e, results) => {
       res.json(results);
     });

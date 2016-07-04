@@ -1,0 +1,23 @@
+extends layout
+
+block content
+
+  h2 Users
+
+  if users && users.length
+    .export
+      a(href='/downloads/users.csv') Export as .csv file
+
+    table.results.table.table-striped
+      thead
+        tr
+          th.number Number
+          each question, i in questions
+            th(title= questions[i])= "Q" + (i + 1)
+
+      tbody
+      each user in users
+        tr.result
+          td.number= user.src
+          each question, i in questions
+            td= (user.answers[i]) ? user.answers[i].answer : ''
