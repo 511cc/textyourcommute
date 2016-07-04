@@ -86,6 +86,10 @@ module.exports = function routes(app){
       .exec((e, results) => {
         if(e) return next(e);
 
+        results.forEach((result) => {
+          result.date = moment(result.date).tz('America/Los_Angeles').format('YYYY-MM-DD');
+        });
+
         DailySurvey.count((e, count) => {
           if(e) return next(e);
           res.render('results', {
@@ -208,7 +212,7 @@ module.exports = function routes(app){
         results.forEach((result) => {
           csv += [
             result.src,
-            result.date,
+            moment(result.date).tz('America/Los_Angeles').format('YYYY-MM-DD'),
             result.commuted,
             result.amMode,
             result.pmMode
