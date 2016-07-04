@@ -23,7 +23,7 @@ exports.setupModels = function() {
 
   mongoose.model('daily_survey', new mongoose.Schema({
     src: { type: String, trim: true },
-    date: Date,
+    date: { type: Date, index: true },
     commuted: Boolean,
     amMode: String,
     pmMode: String

@@ -81,7 +81,7 @@ module.exports = function routes(app){
     DailySurvey
       .find()
       .lean()
-      .sort({$natural: -1})
+      .sort({date: -1})
       .limit(resultsPerPage)
       .skip((page - 1) * resultsPerPage)
       .exec((e, results) => {
@@ -202,7 +202,7 @@ module.exports = function routes(app){
   app.get('/downloads/results.csv', isAuthenticated, (req, res, next) => {
     DailySurvey
       .find()
-      .sort({$natural: -1})
+      .sort({date: -1})
       .exec((e, results) => {
         if(e) return next(e);
 
