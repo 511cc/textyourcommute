@@ -34,8 +34,8 @@ module.exports = function routes(app){
   app.get('/messageLog/:page', isAuthenticated, getMessageLog);
 
   function getMessageLog(req, res, next) {
-    var resultsPerPage = 100;
-    var page = (parseInt(req.body.page, 10)) ? req.body.page : 1;
+    const resultsPerPage = 100;
+    const page = req.body.page || 1;
     Sms
       .find()
       .sort({$natural: -1})
@@ -45,7 +45,13 @@ module.exports = function routes(app){
         if(e) return next(e);
         Sms.count((e, count) => {
           if(e) return next(e);
-          res.render('messageLog', {results: results, page: page, pages: Math.ceil(count / resultsPerPage), resultsPerPage: resultsPerPage});
+          
+          res.render('messageLog', {
+            results: results,
+            page: page,
+            pages: Math.ceil(count / resultsPerPage),
+            resultsPerPage: resultsPerPage
+          });
         });
       });
   }
@@ -56,7 +62,10 @@ module.exports = function routes(app){
       .sort({$natural: -1})
       .exec((e, results) => {
         if(e) return next(e);
-        res.render('results', { results: results, questions: questions.questions });
+        res.render('results', {
+          results: results,
+          questions: questions.questions
+        });
       });
   });
 

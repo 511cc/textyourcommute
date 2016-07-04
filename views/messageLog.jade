@@ -3,10 +3,8 @@ extends layout
 block content
 
   h2 Message log
-  .topNavigation Page #{page} of #{pages}
+  .topNavigation= `Page ${page} of ${pages}`
   .navigation
-    - var page = parseInt(page, 10)
-    - var pages = parseInt(pages, 10)
     - var start = (page - 5 <= 0) ? 1 : (page - 5)
     - var end = ((page + 5) > pages) ? pages : (page + 5)
     - if (start > 1)
@@ -20,21 +18,19 @@ block content
     thead
       tr
         th.direction Direction
-        th.msg Message
-        th.src Sender
-        th.dst Recipient
+        th.body Message
+        th.from Sender
+        th.to Recipient
         th.date Timestamp
-        th.response Response
     tbody
       each sms in results
         - var errorClass = (sms.error) ? 'error message' : 'message'
           tr(class= errorClass)
             td.direction= sms.direction
-            td.msg= sms.msg
-            td.src= sms.src
-            td.dst= sms.dst
+            td.body= sms.body
+            td.from= sms.from
+            td.to= sms.to
             td.date= sms.timestamp
-            td.response= sms.responseCode
   .navigation
     - if (start > 1)
         a(href='/messageLog/1') &laquo; First
