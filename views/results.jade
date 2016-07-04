@@ -3,6 +3,16 @@ extends layout
 block content
 
   h2 Results
+  .topNavigation= `Page ${page} of ${pages}`
+  .navigation
+    - var start = (page - 5 <= 0) ? 1 : (page - 5)
+    - var end = ((page + 5) > pages) ? pages : (page + 5)
+    - if (start > 1)
+        a(href='/results/1') &laquo; First
+    - for (var i = start; i <= end; i++)
+        a(href='/results/' + i, class=(i == page) ? 'current' : '')= i
+    - if (end < pages)
+        a(href='/results/' + pages) Last &raquo;
 
   if results && results.length
     .export
@@ -25,3 +35,11 @@ block content
           td= result.commuted
           td= result.amMode || ''
           td= result.pmMode || ''
+          
+  .navigation
+    - if (start > 1)
+        a(href='/results/1') &laquo; First
+    - for (var i = start; i <= end; i++)
+        a(href='/results/' + i, class=(i == page) ? 'current' : '')= i
+    - if (end < pages)
+        a(href='/results/' + pages) Last &raquo;

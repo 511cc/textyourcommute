@@ -71,7 +71,10 @@ module.exports = function routes(app){
       });
   });
 
-  app.get('/results', isAuthenticated, function(req, res, next) {
+  app.get('/results', isAuthenticated, getResults);
+  app.get('/results/:page', isAuthenticated, getResults);
+
+  function getResults(req, res, next) {
     const resultsPerPage = 100;
     const page = req.params.page ? parseInt(req.params.page, 10) : 1;
 
@@ -93,7 +96,7 @@ module.exports = function routes(app){
           });
         });
       });
-  });
+  }
 
   app.get('/tester', isAuthenticated, function(req, res) {
     res.render('tester');
