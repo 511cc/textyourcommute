@@ -184,9 +184,7 @@ module.exports = function routes(app){
         });
         csv += '\n';
         results.forEach((result) => {
-          var line = result.answers.map((answer) => {
-            return answer.answer;
-          });
+          var line = result.answers.map((answer) => answer.answer);
           line.unshift( result.src );
           csv += line.join(',') + '\n';
         });
@@ -208,8 +206,13 @@ module.exports = function routes(app){
         let csv = 'Number,Date,Commuted?,AM Mode,PM Mode\n';
 
         results.forEach((result) => {
-          const line = _.pluck(result, ['src', 'date', 'commuted', 'amMode', 'pmMode']);
-          csv += line.join(',') + '\n';
+          csv += [
+            result.src,
+            result.date,
+            result.commuted,
+            result.amMode,
+            result.pmMode
+          ].join(',') + '\n';
         });
         res.write(csv);
         res.end();
