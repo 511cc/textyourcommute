@@ -24,8 +24,10 @@ block content
           th Number
           th Date
           th Commuted?
-          th AM mode
-          th PM mode
+          th AM mode 1
+          th AM mode 2
+          th PM mode 1
+          th PM mode 2
 
       tbody
       each result in results
@@ -33,8 +35,10 @@ block content
           td= result.src || ''
           td= result.date || ''
           td= result.commuted ? 'yes' : 'no'
-          td= result.amMode || ''
-          td= result.pmMode || ''
+          td= result.amMode1
+          td= result.amMode2
+          td= result.pmMode1
+          td= result.pmMode2
           
   .navigation
     - if (start > 1)

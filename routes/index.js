@@ -74,6 +74,19 @@ module.exports = function routes(app){
   app.get('/results', isAuthenticated, getResults);
   app.get('/results/:page', isAuthenticated, getResults);
 
+  function formatModeResult(result) {
+    if (result === '' || result === undefined) {
+      return ['', ''];
+    }
+
+    const resultsArray  = _.compact(result.split(' ').map((item) => item.trim()));
+
+    return [
+      resultsArray.shift() || '',
+      resultsArray.shift() || ''
+    ];
+  }
+
   function getResults(req, res, next) {
     const resultsPerPage = 100;
     const page = req.params.page ? parseInt(req.params.page, 10) : 1;
@@ -89,6 +102,12 @@ module.exports = function routes(app){
 
         results.forEach((result) => {
           result.date = moment(result.date).tz('America/Los_Angeles').format('YYYY-MM-DD');
+          const amModeArray = formatModeResult(result.amMode);
+          const pmModeArray = formatModeResult(result.pmMode);
+          result.amMode1 = amModeArray[0];
+          result.amMode2 = amModeArray[1];
+          result.pmMode1 = pmModeArray[0];
+          result.pmMode2 = pmModeArray[1];
         });
 
         DailySurvey.count((e, count) => {
