@@ -24,10 +24,14 @@ block content
           th Number
           th Date
           th Commuted?
-          th AM mode 1
-          th AM mode 2
-          th PM mode 1
-          th PM mode 2
+          th 
+            span(title=modeOptions.join(' ')) AM mode 1
+          th
+            span(title=modeOptions.join(' ')) AM mode 2
+          th
+            span(title=modeOptions.join(' ')) PM mode 1
+          th
+            span(title=modeOptions.join(' ')) PM mode 2
 
       tbody
       each result in results

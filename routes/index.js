@@ -116,7 +116,8 @@ module.exports = function routes(app){
             results: results,
             page: page,
             pages: Math.ceil(count / resultsPerPage),
-            resultsPerPage: resultsPerPage
+            resultsPerPage: resultsPerPage,
+            modeOptions: questions.modeOptions
           });
         });
       });
