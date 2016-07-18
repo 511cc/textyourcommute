@@ -68,19 +68,28 @@ function sendCommuteQuestion(user, cb) {
   }
 }
 
-IntroSurvey.find({status: 'completed'}, (e, users) => {
-  if(e) return handleError(e);
-
-  async.each(users, sendCommuteQuestion, (e) => {
-    if (e) {
-      console.error(e);
-    }
-    debug('Complete');
-    process.exit(0);
-  });
-});
-
 function handleError(e) {
   console.error(e.stack);
   process.exit(1);
+}
+
+function sendDailySurvey() {
+  IntroSurvey.find({status: 'completed'}, (e, users) => {
+    if(e) return handleError(e);
+
+    async.each(users, sendCommuteQuestion, (e) => {
+      if (e) {
+        console.error(e);
+      }
+      debug('Complete');
+      process.exit(0);
+    });
+  });
+}
+
+
+// Do survey if it is a weekday
+const dayOfWeek = moment().tz('America/Los_Angeles').day();
+if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+  sendDailySurvey();
 }
