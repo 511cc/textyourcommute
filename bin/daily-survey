@@ -43,26 +43,24 @@ function sendCommuteQuestion(user, cb) {
       src: user.src,
       date: date
     });
-    dailySurvey.save((e) => {
-      if(e) return cb(e);
-
-      // ask if user commuted
-      sendSMS(user.src, questions.daily, cb);
-    });
+    dailySurvey.save()
+      .then(() => {
+        // ask if user commuted
+        sendSMS(user.src, questions.daily, cb);
+      }, cb);
   } else if(argv.type === 'pm') {
-    DailySurvey.findOne({src: user.src, date: date}, (e, dailySurvey) => {
-      if(e) return cb(e);
-
-      if(!dailySurvey) {
-        debug(`Skipping ${user.src} becasue no daily_survey found`);
-        cb();
-      } else if(dailySurvey.commuted && dailySurvey.amMode) {
-        sendSMS(user.src, questions.dailyEvening, cb);
-      } else {
-        debug(`Skipping ${user.src} because commuted=${dailySurvey.commuted} amMode=${dailySurvey.amMode}`);
-        cb();
-      }
-    });
+    DailySurvey.findOne({src: user.src, date: date})
+      .then((dailySurvey) => {
+        if(!dailySurvey) {
+          debug(`Skipping ${user.src} becasue no daily_survey found`);
+          cb();
+        } else if(dailySurvey.commuted && dailySurvey.amMode) {
+          sendSMS(user.src, questions.dailyEvening, cb);
+        } else {
+          debug(`Skipping ${user.src} because commuted=${dailySurvey.commuted} amMode=${dailySurvey.amMode}`);
+          cb();
+        }
+      }, cb);
   } else {
     cb();
   }
@@ -74,22 +72,27 @@ function handleError(e) {
 }
 
 function sendDailySurvey() {
-  IntroSurvey.find({status: 'completed'}, (e, users) => {
-    if(e) return handleError(e);
+  const query = {status: 'completed'};
 
-    async.each(users, sendCommuteQuestion, (e) => {
-      if (e) {
-        console.error(e);
-      }
-      debug('Complete');
-      process.exit(0);
-    });
-  });
+  // Only send weekend surveys to users who indicated that they work on weekends
+  const dayOfWeek = moment().tz('America/Los_Angeles').day();
+  if (dayOfWeek === 0 || dayOfWeek === 6) {
+    query['answers.number'] = 4;
+    query['answers.answer'] = 'yes';
+  }
+
+  IntroSurvey.find(query)
+    .then((users) => {
+      async.each(users, sendCommuteQuestion, (e) => {
+        if (e) {
+          console.error(e);
+        }
+        debug('Complete');
+        process.exit(0);
+      });
+    }, handleError);
 }
 
 
-// Do survey if it is a weekday
-const dayOfWeek = moment().tz('America/Los_Angeles').day();
-if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-  sendDailySurvey();
-}
+// Trigger survey
+sendDailySurvey();

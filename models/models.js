@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 
-exports.setupModels = function() {
+exports.setupModels = () => {
   mongoose.model('sms', new mongoose.Schema({
     messageSid: String,
     from: String,
@@ -11,7 +11,7 @@ exports.setupModels = function() {
   }, {strict: true}));
 
   var Question = new mongoose.Schema({
-    number: String,
+    number: Number,
     answer: String
   }, {strict: true});
 
