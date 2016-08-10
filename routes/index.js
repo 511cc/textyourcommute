@@ -137,6 +137,30 @@ module.exports = function routes(app){
   });
 
 
+  app.get('/notification', isAuthenticated, function(req, res) {
+    res.render('notification');
+  });
+
+
+  app.post('/api/notification', isAuthenticated, function(req, res, next) {
+    if(!req.body.notificationText) {
+      return next(new Error('No notification text sent'));
+    }
+
+    if(req.body.notificationText.length > 160) {
+      return next(new Error('Notification text too long (max 160 characters)'));
+    }
+
+    survey.sendNotification(app, req.body.notificationText, (err, results) => {
+      if(err) {
+        return next(err);
+      }
+
+      return res.json(results);
+    });
+  });
+
+
   app.get('/login', function(req, res) {
     res.render('login', { title: 'Text Your Commute | Login', loggedIn: false });
   });

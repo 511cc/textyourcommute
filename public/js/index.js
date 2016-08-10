@@ -69,3 +69,35 @@ $('#testSMS').submit(function() {
   });
   return false;
 });
+
+/* Notification Page */
+$('#notification').submit(function(e) {
+  e.preventDefault();
+
+  var notificationText = $('[name="notification"]', this).val();
+  if(!notificationText) {
+    return alert('Error: No notification text provided');
+  }
+
+  if(notificationText.length > 160) {
+    return alert('Error: Notification text too long (max 160 characters)');
+  }
+
+  if(confirm('Warning - about to send message "' + notificationText + '" to all regstered users.')) {
+    $('#notification .btn-primary').attr('disabled', true).val('Sending');
+
+    $.post('/api/notification', {
+      notificationText: notificationText
+    }, function(data) {
+      console.log(data);
+
+      var userMessage = '<b>Success</b><br>';
+
+      if(data && data.twilioErrors) {
+        userMessage += data.twilioErrors.join('<br>');
+      }
+      $('#notification .btn-primary').val('Sent');
+      $('#notificationResults').removeClass().addClass('alert alert-success').html(userMessage);
+    });
+  }
+});

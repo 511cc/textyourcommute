@@ -1,0 +1,19 @@
+extends layout
+
+block content
+  .row
+    .col-md-6.col-md-offset-3
+      .well
+        .row
+          .col-md-10.col-md-offset-1
+            h2 Send a Notification to All Users
+          
+            form#notification.form-horizontal
+              .form-group
+                label Notification Text (maximum 160 characters)
+                textarea.form-control.notification(name="notification" style="height: 80px;")
+              input.btn.btn-primary(type="submit", value="Send Notification to all Users")
+        .row
+          .col-md-10.col-md-offset-1(style="margin-top:20px;")
+            #notificationResults.alert.alert-success.hide
+          
