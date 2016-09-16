@@ -10,5 +10,8 @@
 
 ## Trigger daily email
 
-    ./bin/daily-survey --type am
-    ./bin/daily-survey --type pm
+Morning at 17:00 UTC
+    DEBUG=textyourcommute ./bin/daily-survey --type am
+
+Evening at 2:00 UTC
+    DEBUG=textyourcommute ./bin/daily-survey --type pm
