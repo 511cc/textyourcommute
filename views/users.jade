@@ -3,6 +3,17 @@ extends layout
 block content
 
   h2 Users
+  .topNavigation= `Page ${page} of ${pages}`
+  .navigation
+    - var start = (page - 5 <= 0) ? 1 : (page - 5)
+    - var end = ((page + 5) > pages) ? pages : (page + 5)
+    - if (start > 1)
+        a(href='/users/1') &laquo; First
+    - for (var i = start; i <= end; i++)
+        a(href='/users/' + i, class=(i == page) ? 'current' : '')= i
+    - if (end < pages)
+        a(href='/users/' + pages) Last &raquo;
+
 
   if users && users.length
     .export
@@ -21,3 +32,11 @@ block content
           td.number= user.src
           each question, i in questions
             td= (user.answers[i]) ? user.answers[i].answer : ''
+
+  .navigation
+    - if (start > 1)
+        a(href='/users/1') &laquo; First
+    - for (var i = start; i <= end; i++)
+        a(href='/users/' + i, class=(i == page) ? 'current' : '')= i
+    - if (end < pages)
+        a(href='/users/' + pages) Last &raquo;

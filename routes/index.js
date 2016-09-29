@@ -58,18 +58,33 @@ module.exports = function routes(app){
       });
   }
 
-  app.get('/users', isAuthenticated, function(req, res, next) {
+  app.get('/users', isAuthenticated, getUsers);
+  app.get('/users/:page', isAuthenticated, getUsers);
+
+  function getUsers(req, res, next) {
+    const resultsPerPage = 100;
+    const page = req.params.page ? parseInt(req.params.page, 10) : 1;
+
     Survey
       .find()
       .sort({$natural: -1})
+      .limit(resultsPerPage)
+      .skip((page - 1) * resultsPerPage)
       .exec((e, users) => {
         if(e) return next(e);
-        res.render('users', {
-          users: users,
-          questions: questions.questions
+
+        Survey.count((e, count) => {
+          if(e) return next(e);
+          res.render('users', {
+            users: users,
+            questions: questions.questions,
+            page: page,
+            pages: Math.ceil(count / resultsPerPage),
+            resultsPerPage: resultsPerPage
+          });
         });
       });
-  });
+  }
 
   app.get('/results', isAuthenticated, getResults);
   app.get('/results/:page', isAuthenticated, getResults);
