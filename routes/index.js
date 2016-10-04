@@ -89,6 +89,11 @@ module.exports = function routes(app){
   app.get('/results', isAuthenticated, getResults);
   app.get('/results/:page', isAuthenticated, getResults);
 
+  function isNormalInteger(str) {
+    var n = ~~Number(str);
+    return String(n) === str && n >= 0;
+  }
+
   function formatModeResult(result) {
     if (result === '' || result === undefined) {
       return ['', ''];
@@ -96,10 +101,16 @@ module.exports = function routes(app){
 
     const resultsArray  = _.compact(result.split(' ').map((item) => item.trim()));
 
-    return [
+    let formattedResult = [
       resultsArray.shift() || '',
       resultsArray.shift() || ''
     ];
+
+    if (!isNormalInteger(formattedResult[0])) {
+      formattedResult = [result, ''];
+    }
+
+    return formattedResult;
   }
 
   function getResults(req, res, next) {
