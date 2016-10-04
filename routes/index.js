@@ -99,7 +99,7 @@ module.exports = function routes(app){
       return ['', ''];
     }
 
-    const resultsArray  = _.compact(result.split(' ').map((item) => item.trim()));
+    const resultsArray  = _.compact(result.split(' ').map((item) => item.trim().replace(/,/g, '')));
 
     let formattedResult = [
       resultsArray.shift() || '',
