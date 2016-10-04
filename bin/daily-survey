@@ -46,7 +46,13 @@ function sendCommuteQuestion(user, cb) {
     dailySurvey.save()
       .then(() => {
         // ask if user commuted
-        sendSMS(user.src, questions.daily, cb);
+        sendSMS(user.src, questions.daily, (e) => {
+          if(e) {
+            return cb(e);
+          }
+          // Wait a bit, so we spread out the SMS
+          setTimeout(cb, 500);
+        });
       }, cb);
   } else if(argv.type === 'pm') {
     DailySurvey.findOne({src: user.src, date: date})
@@ -83,7 +89,7 @@ function sendDailySurvey() {
 
   IntroSurvey.find(query)
     .then((users) => {
-      async.each(users, sendCommuteQuestion, (e) => {
+      async.eachLimit(users, 5, sendCommuteQuestion, (e) => {
         if (e) {
           console.error(e);
         }
