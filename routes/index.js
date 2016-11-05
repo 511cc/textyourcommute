@@ -259,7 +259,10 @@ module.exports = function routes(app){
         });
         csv += '\n';
         results.forEach((result) => {
-          var line = result.answers.map((answer) => answer.answer);
+          var line = result.answers.map((answer) => {
+            let item = answer.answer !== undefined ? answer.answer : '';
+            return `"${item}"`;
+          });
           line.unshift(`"${result.src}"`);
           csv += line.join(',') + '\n';
         });
@@ -281,12 +284,15 @@ module.exports = function routes(app){
         let csv = 'Number,Date,Commuted?,AM Mode,PM Mode\n';
 
         results.forEach((result) => {
+          let amMode = result.amMode !== undefined ? result.amMode : '';
+          let pmMode = result.pmMode !== undefined ? result.pmMode : '';
+
           csv += [
             result.src,
             moment(result.date).tz('America/Los_Angeles').format('YYYY-MM-DD'),
             result.commuted,
-            `"${result.amMode}"`,
-            `"${result.pmMode}"`
+            `"${amMode}"`,
+            `"${pmMode}"`
           ].join(',') + '\n';
         });
         res.write(csv);
