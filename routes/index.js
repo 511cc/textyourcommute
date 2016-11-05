@@ -251,16 +251,16 @@ module.exports = function routes(app){
       .exec((e, results) => {
         if(e) return next(e);
 
-        res.writeHead(200, {'Content-Type':'text/csv'});
+        res.writeHead(200, { 'Content-Type': 'text/csv' });
 
         var csv = 'Number';
         results[0].answers.forEach((answer, i) => {
-          csv += ',Q' + (i+1);
+          csv += `,Q${i + 1}`;
         });
         csv += '\n';
         results.forEach((result) => {
           var line = result.answers.map((answer) => answer.answer);
-          line.unshift( result.src );
+          line.unshift(`"${result.src}"`);
           csv += line.join(',') + '\n';
         });
         res.write(csv);
@@ -285,8 +285,8 @@ module.exports = function routes(app){
             result.src,
             moment(result.date).tz('America/Los_Angeles').format('YYYY-MM-DD'),
             result.commuted,
-            result.amMode,
-            result.pmMode
+            `"${result.amMode}"`,
+            `"${result.pmMode}"`
           ].join(',') + '\n';
         });
         res.write(csv);
