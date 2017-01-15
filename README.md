@@ -1,5 +1,7 @@
 # Text Your Commute
 
+A daily SMS survey to determine mode choice.
+
 ## Setup
 
     npm install
