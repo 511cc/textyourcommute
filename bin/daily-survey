@@ -12,7 +12,7 @@ nconf
 const twilio = require('twilio');
 const client = twilio(nconf.get('TWILIO_SID'), nconf.get('TWILIO_AUTH_TOKEN'));
 
-const db = require('mongoose').connect(nconf.get('MONGOLAB_URI'));
+const db = require('mongoose').connect(nconf.get('MONGOLAB_URI'), {useMongoClient: true});
 
 require('../models/models').setupModels();
 

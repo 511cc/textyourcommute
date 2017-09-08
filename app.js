@@ -12,7 +12,7 @@ nconf
   .env()
   .file({file:'./config.json'});
 
-var db = require('mongoose').connect(nconf.get('MONGOLAB_URI'));
+var db = require('mongoose').connect(nconf.get('MONGOLAB_URI'), {useMongoClient: true});
 
 require('./models/models').setupModels();
 
