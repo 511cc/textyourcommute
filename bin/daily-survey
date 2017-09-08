@@ -10,7 +10,7 @@ nconf
   .file({file:'./config.json'});
 
 const twilio = require('twilio');
-const client = twilio(nconf.get('TWILIO_SID'), nconf.get('TWILIO_AUTH_TOKEN'));
+const client = new twilio(nconf.get('TWILIO_SID'), nconf.get('TWILIO_AUTH_TOKEN'));
 
 const db = require('mongoose').connect(nconf.get('MONGOLAB_URI'), {useMongoClient: true});
 
@@ -21,17 +21,12 @@ const DailySurvey = db.model('daily_survey');
 
 const questions = require('../lib/questions');
 
-function sendSMS(to, body, cb) {
+function sendSMS(to, body) {
   debug(`Sending SMS to ${to}`);
-  client.sendMessage({
+  return client.messages.create({
     to: to,
     from: nconf.get('TWILIO_NUMBER'),
     body: body
-  }, (e, response) => {
-    if(e) {
-      console.error(e);
-    }
-    cb();
   });
 }
 
@@ -46,13 +41,12 @@ function sendCommuteQuestion(user, cb) {
     dailySurvey.save()
       .then(() => {
         // ask if user commuted
-        sendSMS(user.src, questions.daily, (e) => {
-          if(e) {
-            return cb(e);
-          }
+        sendSMS(user.src, questions.daily)
+        .then(() => {
           // Wait a bit, so we spread out the SMS
           setTimeout(cb, 500);
-        });
+        })
+        .catch(cb);
       }, cb);
   } else if(argv.type === 'pm') {
     DailySurvey.findOne({src: user.src, date: date})
@@ -61,7 +55,11 @@ function sendCommuteQuestion(user, cb) {
           debug(`Skipping ${user.src} becasue no daily_survey found`);
           cb();
         } else if(dailySurvey.commuted && dailySurvey.amMode) {
-          sendSMS(user.src, questions.dailyEvening, cb);
+          sendSMS(user.src, questions.dailyEvening)
+          .then(() => {
+            cb();
+          })
+          .catch(cb);
         } else {
           debug(`Skipping ${user.src} because commuted=${dailySurvey.commuted} amMode=${dailySurvey.amMode}`);
           cb();
