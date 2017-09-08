@@ -1,32 +1,33 @@
-var express = require('express');
-var path = require('path');
-var url = require('url');
-var logger = require('morgan');
-var bodyParser = require('body-parser');
-var cookieParser = require('cookie-parser');
-var session = require('express-session');
-var nconf = require('nconf');
+const path = require('path');
+const url = require('url');
+
+const express = require('express');
+const logger = require('morgan');
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
+const mongoose = require('mongoose');
+const nconf = require('nconf');
 
 nconf
   .argv()
   .env()
-  .file({file:'./config.json'});
+  .file({file: './config.json'});
 
-var db = require('mongoose').connect(nconf.get('MONGOLAB_URI'), {useMongoClient: true});
-
-mongoose.Promise = global.Promise
+mongoose.Promise = global.Promise;
+const db = mongoose.connect(nconf.get('MONGOLAB_URI'), {useMongoClient: true});
 
 require('./models/models').setupModels();
 
-var app = express();
+const app = express();
 
-if(app.get('env') === 'development') {
+if (app.get('env') === 'development') {
   app.use(require('connect-livereload')());
 }
 
 app.set('db', db);
 
-app.set('views', __dirname + '/views');
+app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'jade');
 
 app.use(logger('combined'));
@@ -37,12 +38,12 @@ app.use(bodyParser.urlencoded({
 app.use(cookieParser(nconf.get('SESSION_SECRET')));
 app.use(express.static(path.join(__dirname, 'public')));
 
-var store;
-var cookie;
+let store;
+let cookie;
 
-if(app.get('env') !== 'development') {
-  var RedisStore = require('connect-redis')(session);
-  var redisURL = url.parse(nconf.get('REDIS_URL'));
+if (app.get('env') !== 'development') {
+  const RedisStore = require('connect-redis')(session);
+  const redisURL = url.parse(nconf.get('REDIS_URL'));
   store = new RedisStore({
     host: redisURL.hostname,
     port: redisURL.port,
@@ -53,7 +54,7 @@ if(app.get('env') !== 'development') {
     maxAge: 31536000000
   };
 } else {
-  var memoryStore = session.MemoryStore;
+  const memoryStore = session.MemoryStore;
   store = new memoryStore();
   cookie = {
     maxAge: 3600000
@@ -61,17 +62,16 @@ if(app.get('env') !== 'development') {
 }
 
 app.use(session({
-  store: store,
+  store,
   secret: nconf.get('SESSION_SECRET'),
   saveUninitialized: true,
   resave: true,
-  cookie: cookie
+  cookie
 }));
-
 
 require('./routes')(app);
 
-// error handlers
+// Error handlers
 require('./lib/errors')(app);
 
 module.exports = app;

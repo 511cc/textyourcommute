@@ -3,6 +3,7 @@ const async = require('async');
 const debug = require('debug')('textyourcommute');
 const nconf = require('nconf');
 const moment = require('moment-timezone');
+const mongoose = require('mongoose');
 const argv = require('yargs').argv;
 nconf
   .argv()
@@ -12,9 +13,8 @@ nconf
 const twilio = require('twilio');
 const client = new twilio(nconf.get('TWILIO_SID'), nconf.get('TWILIO_AUTH_TOKEN'));
 
-const db = require('mongoose').connect(nconf.get('MONGOLAB_URI'), {useMongoClient: true});
-
-mongoose.Promise = global.Promise
+mongoose.Promise = global.Promise;
+const db = mongoose.connect(nconf.get('MONGOLAB_URI'), {useMongoClient: true});
 
 require('../models/models').setupModels();
 
