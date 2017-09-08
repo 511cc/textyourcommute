@@ -14,6 +14,8 @@ nconf
 
 var db = require('mongoose').connect(nconf.get('MONGOLAB_URI'), {useMongoClient: true});
 
+mongoose.Promise = global.Promise
+
 require('./models/models').setupModels();
 
 var app = express();
