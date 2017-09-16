@@ -83,8 +83,12 @@ function sendDailySurvey() {
   // Only send weekend surveys to users who indicated that they work on weekends
   const dayOfWeek = moment().tz('America/Los_Angeles').day();
   if (dayOfWeek === 0 || dayOfWeek === 6) {
-    query['answers.number'] = 4;
-    query['answers.answer'] = 'yes';
+    query.answers = {
+      $elemMatch: {
+        number: 4,
+        answer: 'yes'
+      }
+    };
   }
 
   IntroSurvey.find(query)
