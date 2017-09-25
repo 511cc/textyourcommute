@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "author": "Brendan Nee <brendan@blinktag.com>",
   "dependencies": {
+    "@sendgrid/mail": "^6.1.4",
     "async": "2.5.0",
     "bcrypt": "1.0.3",
     "body-parser": "1.17.2",
@@ -53,6 +54,6 @@
     "xo": "^0.18.2"
   },
   "xo": {
-		"space": true
-	}
+    "space": true
+  }
 }
