@@ -8,7 +8,7 @@ const argv = require('yargs').argv;
 nconf
   .argv()
   .env()
-  .file({file:'./config.json'});
+  .file({file: './config.json'});
 
 const twilio = require('twilio');
 const client = new twilio(nconf.get('TWILIO_SID'), nconf.get('TWILIO_AUTH_TOKEN'));

@@ -1,0 +1,36 @@
+#!/usr/bin/env node
+const async = require('async');
+const debug = require('debug')('textyourcommute');
+const nconf = require('nconf');
+const _ = require('underscore');
+const twilio = require('twilio');
+const argv = require('yargs').argv;
+nconf
+  .argv()
+  .env()
+  .file({file: './config.json'});
+
+const client = new twilio(nconf.get('TWILIO_SID'), nconf.get('TWILIO_AUTH_TOKEN'));
+
+const numbers = [];
+
+const notificationText = 'The Text-Your-Commute challenge is back for 2017. Reply with "start" to earn up to $100 for texting your clean commutes.';
+
+async.each(numbers, (number, cb) => {
+  client.messages.create({
+    from: nconf.get('TWILIO_NUMBER'),
+    to: number,
+    body: notificationText
+  })
+  .catch(err => {
+    if(err && err.message) {
+      console.error(`${number}: ${err.message}`);
+    }
+    cb();
+  });
+}, (err) => {
+  if(err) {
+    console.error(err);
+  }
+  cb();
+});
