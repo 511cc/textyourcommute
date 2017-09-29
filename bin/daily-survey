@@ -48,20 +48,26 @@ function sendCommuteQuestion(user, cb) {
           // Wait a bit, so we spread out the SMS
           setTimeout(cb, 500);
         })
-        .catch(cb);
+        .catch(err => {
+          console.error(err);
+          cb();
+        });
       }, cb);
   } else if(argv.type === 'pm') {
     DailySurvey.findOne({src: user.src, date: date})
       .then((dailySurvey) => {
         if(!dailySurvey) {
-          debug(`Skipping ${user.src} becasue no daily_survey found`);
+          debug(`Skipping ${user.src} because no daily_survey found`);
           cb();
         } else if(dailySurvey.commuted && dailySurvey.amMode) {
           sendSMS(user.src, questions.dailyEvening)
           .then(() => {
             cb();
           })
-          .catch(cb);
+          .catch(err => {
+            console.error(err);
+            cb();
+          });
         } else {
           debug(`Skipping ${user.src} because commuted=${dailySurvey.commuted} amMode=${dailySurvey.amMode}`);
           cb();
