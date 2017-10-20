@@ -34,32 +34,51 @@ function sendSMS(to, body) {
 
 function sendCommuteQuestion(user, cb) {
   const date = moment().tz('America/Los_Angeles').startOf('day');
-  if(argv.type === 'am') {
 
-    const dailySurvey = new DailySurvey({
-      src: user.src,
-      date: date
-    });
-    dailySurvey.save()
-      .then(() => {
-        // ask if user commuted
-        sendSMS(user.src, questions.daily)
+  const maxSurveyDays = 36;
+  DailySurvey.find({src: user.src}).sort({date: 1}).limit(1)
+  .then(dailySurvey => {
+    if (dailySurvey.length > 0) {
+      const surveyDays = date.diff(moment(dailySurvey[0].date), 'days');
+      if (surveyDays === maxSurveyDays) {
+        if (argv.type === 'am') {
+          return sendSMS(user.src, questions.surveyThankyou)
+          .then(() => {
+            cb();
+          });
+        } else {
+          return cb();
+        }
+      } else if (surveyDays > maxSurveyDays) {
+        return cb();
+      }
+    }
+
+    if (argv.type === 'am') {
+      const dailySurvey = new DailySurvey({
+        src: user.src,
+        date
+      });
+      dailySurvey.save()
         .then(() => {
-          // Wait a bit, so we spread out the SMS
-          setTimeout(cb, 500);
-        })
-        .catch(err => {
-          console.error(err);
-          cb();
-        });
-      }, cb);
-  } else if(argv.type === 'pm') {
-    DailySurvey.findOne({src: user.src, date: date})
-      .then((dailySurvey) => {
-        if(!dailySurvey) {
+          // Ask if user commuted
+          sendSMS(user.src, questions.daily)
+          .then(() => {
+            // Wait a bit, so we spread out the SMS
+            setTimeout(cb, 500);
+          })
+          .catch(err => {
+            console.error(err);
+            cb();
+          });
+        }, cb);
+    } else if (argv.type === 'pm') {
+      DailySurvey.findOne({src: user.src, date})
+      .then(dailySurvey => {
+        if (!dailySurvey) {
           debug(`Skipping ${user.src} because no daily_survey found`);
           cb();
-        } else if(dailySurvey.commuted && dailySurvey.amMode) {
+        } else if (dailySurvey.commuted && dailySurvey.amMode) {
           sendSMS(user.src, questions.dailyEvening)
           .then(() => {
             cb();
@@ -73,9 +92,10 @@ function sendCommuteQuestion(user, cb) {
           cb();
         }
       }, cb);
-  } else {
-    cb();
-  }
+    } else {
+      cb();
+    }
+  });
 }
 
 function handleError(e) {
@@ -98,17 +118,16 @@ function sendDailySurvey() {
   }
 
   IntroSurvey.find(query)
-    .then((users) => {
-      async.eachLimit(users, 5, sendCommuteQuestion, (e) => {
-        if (e) {
-          console.error(e);
-        }
-        debug('Complete');
-        process.exit(0);
-      });
-    }, handleError);
+  .then(users => {
+    async.eachLimit(users, 5, sendCommuteQuestion, e => {
+      if (e) {
+        console.error(e);
+      }
+      debug('Complete');
+      process.exit(0);
+    });
+  }, handleError);
 }
-
 
 // Trigger survey
 sendDailySurvey();
