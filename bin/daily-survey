@@ -35,7 +35,7 @@ function sendSMS(to, body) {
 function sendCommuteQuestion(user, cb) {
   const date = moment().tz('America/Los_Angeles').startOf('day');
 
-  const maxSurveyDays = 36;
+  const maxSurveyDays = 30;
   DailySurvey.find({src: user.src}).sort({date: 1}).limit(1)
   .then(dailySurvey => {
     if (dailySurvey.length > 0) {
