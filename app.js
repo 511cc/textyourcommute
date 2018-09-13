@@ -28,7 +28,7 @@ if (app.get('env') === 'development') {
 app.set('db', db);
 
 app.set('views', path.join(__dirname, '/views'));
-app.set('view engine', 'jade');
+app.set('view engine', 'pug');
 
 app.use(logger('combined'));
 app.use(bodyParser.json());

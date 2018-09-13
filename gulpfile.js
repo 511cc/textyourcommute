@@ -93,7 +93,7 @@ gulp.task('develop', () => {
     'public/dest/**/*.js',
     'public/css/**/*.css',
     'public/images/**/*',
-    'views/**/*.jade'
+    'views/**/*.pug'
   ], function () {
     server.notify.apply(server, arguments);
   });
