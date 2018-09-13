@@ -1,36 +1,34 @@
-var mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
-exports.setupModels = () => {
-  mongoose.model('sms', new mongoose.Schema({
-    messageSid: String,
-    from: String,
-    to: String,
-    body: String,
-    direction: String,
-    timestamp: String
-  }, {strict: true}));
+exports.SMS = mongoose.model('sms', new mongoose.Schema({
+  messageSid: String,
+  from: String,
+  to: String,
+  body: String,
+  direction: String,
+  timestamp: String
+}, {strict: true}));
 
-  var Question = new mongoose.Schema({
-    number: Number,
-    answer: String
-  }, {strict: true});
+const Question = new mongoose.Schema({
+  number: Number,
+  answer: String
+}, {strict: true});
 
-  mongoose.model('survey', new mongoose.Schema({
-    src: { type: String, unique: true, trim: true },
-    status: String,
-    answers: [Question]
-  }, {strict: true}));
+exports.Survey = mongoose.model('survey', new mongoose.Schema({
+  src: {type: String, unique: true, trim: true},
+  status: String,
+  answers: [Question]
+}, {strict: true}));
 
-  mongoose.model('daily_survey', new mongoose.Schema({
-    src: { type: String, trim: true },
-    date: { type: Date, index: true },
-    commuted: Boolean,
-    amMode: String,
-    pmMode: String
-  }, {strict: true}));
+exports.DailySurvey = mongoose.model('daily_survey', new mongoose.Schema({
+  src: {type: String, trim: true},
+  date: {type: Date, index: true},
+  commuted: Boolean,
+  amMode: String,
+  pmMode: String
+}, {strict: true}));
 
-  mongoose.model('user', new mongoose.Schema({
-    username: { type: String, required: true, unique: true, trim: true },
-    password: { type: String, required: true }
-  }, {strict: true}));
-};
+exports.User = mongoose.model('user', new mongoose.Schema({
+  username: {type: String, required: true, unique: true, trim: true},
+  password: {type: String, required: true}
+}, {strict: true}));

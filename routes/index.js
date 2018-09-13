@@ -9,6 +9,8 @@ const twilio = require('twilio');
 const survey = require('../lib/survey');
 const questions = require('../lib/questions');
 
+const {SMS, User, Survey, DailySurvey} = require('../models/models');
+
 function isAuthenticated(req, res, next) {
   if(req.session.isAuthenticated) {
     next();
@@ -17,16 +19,8 @@ function isAuthenticated(req, res, next) {
   }
 }
 
-
-module.exports = function routes(app){
-  var Sms = app.set('db').model('sms');
-  var User = app.set('db').model('user');
-  var Survey = app.set('db').model('survey');
-  var DailySurvey = app.set('db').model('daily_survey');
-
-  /* Routes */
-
-  app.get('/', isAuthenticated, function(req, res) {
+module.exports = function(app) {
+  app.get('/', isAuthenticated, (req, res) => {
     res.render('index');
   });
 

@@ -15,17 +15,13 @@ nconf
   .file({file: './config.json'});
 
 mongoose.Promise = global.Promise;
-const db = mongoose.connect(nconf.get('MONGOLAB_URI'), {useMongoClient: true});
-
-require('./models/models').setupModels();
+const db = mongoose.connect(nconf.get('MONGOLAB_URI'), {useNewUrlParser: true});
 
 const app = express();
 
 if (app.get('env') === 'development') {
   app.use(require('connect-livereload')());
 }
-
-app.set('db', db);
 
 app.set('views', path.join(__dirname, '/views'));
 app.set('view engine', 'pug');
