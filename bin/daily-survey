@@ -5,16 +5,17 @@ const nconf = require('nconf');
 const moment = require('moment-timezone');
 const mongoose = require('mongoose');
 const argv = require('yargs').argv;
+const Twilio = require('twilio');
+
 nconf
   .argv()
   .env()
   .file({file: './config.json'});
 
-const twilio = require('twilio');
-const client = new twilio(nconf.get('TWILIO_SID'), nconf.get('TWILIO_AUTH_TOKEN'));
+const client = new Twilio(nconf.get('TWILIO_SID'), nconf.get('TWILIO_AUTH_TOKEN'));
 
 mongoose.Promise = global.Promise;
-const db = mongoose.connect(nconf.get('MONGOLAB_URI'), {useMongoClient: true});
+const db = mongoose.connect(nconf.get('MONGOLAB_URI'));
 
 require('../models/models').setupModels();
 
@@ -26,9 +27,9 @@ const questions = require('../lib/questions');
 function sendSMS(to, body) {
   debug(`Sending SMS to ${to}`);
   return client.messages.create({
-    to: to,
+    to,
     from: nconf.get('TWILIO_NUMBER'),
-    body: body
+    body
   });
 }
 
@@ -46,9 +47,9 @@ function sendCommuteQuestion(user, cb) {
           .then(() => {
             cb();
           });
-        } else {
-          return cb();
         }
+
+        return cb();
       } else if (surveyDays > maxSurveyDays) {
         return cb();
       }

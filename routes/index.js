@@ -3,8 +3,9 @@ const debug = require('debug')('textyourcommute');
 const moment = require('moment-timezone');
 const bcrypt = require('bcrypt');
 const nconf = require('nconf');
-const salt = bcrypt.genSaltSync(10);
 const twilio = require('twilio');
+
+const salt = bcrypt.genSaltSync(10);
 
 const survey = require('../lib/survey');
 const questions = require('../lib/questions');
@@ -12,18 +13,17 @@ const questions = require('../lib/questions');
 const {SMS, User, Survey, DailySurvey} = require('../models/models');
 
 function isAuthenticated(req, res, next) {
-  if(req.session.isAuthenticated) {
+  if (req.session.isAuthenticated) {
     next();
   } else {
     res.redirect('/login');
   }
 }
 
-module.exports = function(app) {
+module.exports = function (app) {
   app.get('/', isAuthenticated, (req, res) => {
     res.render('index');
   });
-
 
   app.get('/messageLog', isAuthenticated, getMessageLog);
   app.get('/messageLog/:page', isAuthenticated, getMessageLog);
@@ -32,21 +32,26 @@ module.exports = function(app) {
     const resultsPerPage = 100;
     const page = req.params.page ? parseInt(req.params.page, 10) : 1;
 
-    Sms
+    SMS
       .find()
       .sort({$natural: -1})
       .limit(resultsPerPage)
       .skip((page - 1) * resultsPerPage)
       .exec((e, results) => {
-        if(e) return next(e);
-        Sms.count((e, count) => {
-          if(e) return next(e);
+        if (e) {
+          return next(e);
+        }
+
+        SMS.count((e, count) => {
+          if (e) {
+            return next(e);
+          }
 
           res.render('messageLog', {
-            results: results,
-            page: page,
+            results,
+            page,
             pages: Math.ceil(count / resultsPerPage),
-            resultsPerPage: resultsPerPage
+            resultsPerPage
           });
         });
       });
@@ -65,16 +70,21 @@ module.exports = function(app) {
       .limit(resultsPerPage)
       .skip((page - 1) * resultsPerPage)
       .exec((e, users) => {
-        if(e) return next(e);
+        if (e) {
+          return next(e);
+        }
 
         Survey.count((e, count) => {
-          if(e) return next(e);
+          if (e) {
+            return next(e);
+          }
+
           res.render('users', {
-            users: users,
+            users,
             questions: questions.questions,
-            page: page,
+            page,
             pages: Math.ceil(count / resultsPerPage),
-            resultsPerPage: resultsPerPage
+            resultsPerPage
           });
         });
       });
@@ -84,7 +94,7 @@ module.exports = function(app) {
   app.get('/results/:page', isAuthenticated, getResults);
 
   function isNormalInteger(str) {
-    var n = ~~Number(str);
+    const n = ~~Number(str);
     return String(n) === str && n >= 0;
   }
 
@@ -93,7 +103,7 @@ module.exports = function(app) {
       return ['', ''];
     }
 
-    const resultsArray  = _.compact(result.split(' ').map((item) => item.trim().replace(/,/g, '')));
+    const resultsArray = _.compact(result.split(' ').map(item => item.trim().replace(/,/g, '')));
 
     let formattedResult = [
       resultsArray.shift() || '',
@@ -118,9 +128,11 @@ module.exports = function(app) {
       .limit(resultsPerPage)
       .skip((page - 1) * resultsPerPage)
       .exec((e, results) => {
-        if(e) return next(e);
+        if (e) {
+          return next(e);
+        }
 
-        results.forEach((result) => {
+        results.forEach(result => {
           result.date = moment(result.date).tz('America/Los_Angeles').format('YYYY-MM-DD');
           const amModeArray = formatModeResult(result.amMode);
           const pmModeArray = formatModeResult(result.pmMode);
@@ -131,48 +143,48 @@ module.exports = function(app) {
         });
 
         DailySurvey.count((e, count) => {
-          if(e) return next(e);
+          if (e) {
+            return next(e);
+          }
+
           res.render('results', {
-            results: results,
-            page: page,
+            results,
+            page,
             pages: Math.ceil(count / resultsPerPage),
-            resultsPerPage: resultsPerPage,
+            resultsPerPage,
             modeOptions: questions.modeOptions
           });
         });
       });
   }
 
-  app.get('/tester', isAuthenticated, function(req, res) {
+  app.get('/tester', isAuthenticated, (req, res) => {
     res.render('tester');
   });
 
-
-  app.post('/api/sms-test', isAuthenticated, function(req, res, next) {
-    if(!req.body.Body) {
+  app.post('/api/sms-test', isAuthenticated, (req, res, next) => {
+    if (!req.body.Body) {
       return next(new Error('No SMS body'));
     }
 
     survey.handleIncoming(app, req, res, next);
   });
 
-
-  app.get('/notification', isAuthenticated, function(req, res) {
+  app.get('/notification', isAuthenticated, (req, res) => {
     res.render('notification');
   });
 
-
-  app.post('/api/notification', isAuthenticated, function(req, res, next) {
-    if(!req.body.notificationText) {
+  app.post('/api/notification', isAuthenticated, (req, res, next) => {
+    if (!req.body.notificationText) {
       return next(new Error('No notification text sent'));
     }
 
-    if(req.body.notificationText.length > 160) {
+    if (req.body.notificationText.length > 160) {
       return next(new Error('Notification text too long (max 160 characters)'));
     }
 
     survey.sendNotification(app, req.body.notificationText, (err, results) => {
-      if(err) {
+      if (err) {
         return next(err);
       }
 
@@ -180,61 +192,66 @@ module.exports = function(app) {
     });
   });
 
-
-  app.get('/login', function(req, res) {
-    res.render('login', { title: 'Text Your Commute | Login', loggedIn: false });
+  app.get('/login', (req, res) => {
+    res.render('login', {title: 'Text Your Commute | Login', loggedIn: false});
   });
 
-
-  app.post('/sessions/create', function(req, res, next) {
+  app.post('/sessions/create', (req, res, next) => {
     User.findOne({username: req.body.username}, (e, result) => {
-      if(e) return next(e);
-      if(result && bcrypt.compareSync(req.body.password, result.password)) {
+      if (e) {
+        return next(e);
+      }
+
+      if (result && bcrypt.compareSync(req.body.password, result.password)) {
         req.session.user = {
           username: result.username
         };
         req.session.isAuthenticated = true;
         res.redirect('/');
       } else {
-        res.render('login', { title: 'Text Your Commute | Login', error: 'Login Error' });
+        res.render('login', {title: 'Text Your Commute | Login', error: 'Login Error'});
       }
     });
   });
 
-  app.get('/logout', function(req, res, next) {
-    req.session.destroy(function(e){
-      if(e) return next(e);
+  app.get('/logout', (req, res, next) => {
+    req.session.destroy(e => {
+      if (e) {
+        return next(e);
+      }
+
       res.redirect('/login');
     });
   });
 
-  app.get('/signup', function(req, res) {
-    res.render('signup', { title: 'Text Your Commute | Create New User' });
+  app.get('/signup', (req, res) => {
+    res.render('signup', {title: 'Text Your Commute | Create New User'});
   });
 
-  app.post('/users/create', function(req, res) {
-    if(nconf.get('ALLOW_SIGNUP') === 'true' || req.session.isAuthenticated) {
-      if(req.body.username && req.body.password){
-        if(req.body.password == req.body.passwordAgain){
-          var user = new User({
+  app.post('/users/create', (req, res) => {
+    if (nconf.get('ALLOW_SIGNUP') === 'true' || req.session.isAuthenticated) {
+      if (req.body.username && req.body.password) {
+        if (req.body.password == req.body.passwordAgain) {
+          const user = new User({
             username: req.body.username,
-            password: bcrypt.hashSync( req.body.password, salt )
+            password: bcrypt.hashSync(req.body.password, salt)
           });
-          user.save((e) => {
-            if(e){
-              res.render('signup', { title: 'Text Your Commute | Create New User', error: e});
+
+          user.save(e => {
+            if (e) {
+              res.render('signup', {title: 'Text Your Commute | Create New User', error: e});
             } else {
               res.redirect('/login');
             }
           });
         } else {
-          res.render('signup', { title: 'Text Your Commute | Create New User', error: 'Mismatched Passwords' });
+          res.render('signup', {title: 'Text Your Commute | Create New User', error: 'Mismatched Passwords'});
         }
       } else {
-        res.render('signup', { title: 'Text Your Commute | Create New User', error: 'Missing Username or Password' });
+        res.render('signup', {title: 'Text Your Commute | Create New User', error: 'Missing Username or Password'});
       }
     } else {
-      res.render('signup', { title: 'Text Your Commute | Create New User', error: 'Signup not allowed' });
+      res.render('signup', {title: 'Text Your Commute | Create New User', error: 'Signup not allowed'});
     }
   });
 
@@ -243,18 +260,20 @@ module.exports = function(app) {
       .find()
       .sort({$natural: -1})
       .exec((e, results) => {
-        if(e) return next(e);
+        if (e) {
+          return next(e);
+        }
 
-        res.writeHead(200, { 'Content-Type': 'text/csv' });
+        res.writeHead(200, {'Content-Type': 'text/csv'});
 
         var csv = 'Number';
         results[0].answers.forEach((answer, i) => {
           csv += `,Q${i + 1}`;
         });
         csv += '\n';
-        results.forEach((result) => {
-          var line = result.answers.map((answer) => {
-            let item = answer.answer !== undefined ? answer.answer : '';
+        results.forEach(result => {
+          const line = result.answers.map((answer) => {
+            const item = answer.answer !== undefined ? answer.answer : '';
             return `"${item}"`;
           });
           line.unshift(`"${result.src}"`);
@@ -265,21 +284,22 @@ module.exports = function(app) {
       });
   });
 
-
   app.get('/downloads/results.csv', isAuthenticated, (req, res, next) => {
     DailySurvey
       .find()
       .sort({date: -1})
       .exec((e, results) => {
-        if(e) return next(e);
+        if (e) {
+          return next(e);
+        }
 
-        res.writeHead(200, {'Content-Type':'text/csv'});
+        res.writeHead(200, {'Content-Type': 'text/csv'});
 
         let csv = 'Number,Date,Commuted?,AM Mode,PM Mode\n';
 
-        results.forEach((result) => {
-          let amMode = result.amMode !== undefined ? result.amMode : '';
-          let pmMode = result.pmMode !== undefined ? result.pmMode : '';
+        results.forEach(result => {
+          const amMode = result.amMode !== undefined ? result.amMode : '';
+          const pmMode = result.pmMode !== undefined ? result.pmMode : '';
 
           csv += [
             result.src,
@@ -294,21 +314,19 @@ module.exports = function(app) {
       });
   });
 
-
   app.get('/api/questions', isAuthenticated, (req, res) => {
     res.json(questions);
   });
 
-
-  app.post('/incoming', twilio.webhook({url: nconf.get('TWILIO_WEBHOOK_URL'),}), (req, res, next) => {
-    if(!req.body.Body) {
+  app.post('/incoming', twilio.webhook({url: nconf.get('TWILIO_WEBHOOK_URL')}), (req, res, next) => {
+    if (!req.body.Body) {
       return next(new Error('No SMS body'));
     }
 
     debug(`Incoming SMS from ${req.body.From}: ${req.body.Body}`);
 
-    //Save SMS
-    var sms = new Sms({
+    // Save SMS
+    const sms = new SMS({
       messageSid: req.body.MessageSid,
       from: req.body.From,
       to: req.body.To,
@@ -321,8 +339,7 @@ module.exports = function(app) {
     survey.handleIncoming(app, req, res, next);
   });
 
-
-  app.get('/api/users', isAuthenticated, function(req, res) {
+  app.get('/api/users', isAuthenticated, (req, res) => {
     Survey.find((e, results) => {
       res.json(results);
     });
