@@ -15,7 +15,7 @@ nconf
   .file({file: './config.json'});
 
 mongoose.Promise = global.Promise;
-const db = mongoose.connect(nconf.get('MONGOLAB_URI'), {useNewUrlParser: true});
+mongoose.connect(nconf.get('MONGOLAB_URI'), {useNewUrlParser: true});
 
 const app = express();
 
@@ -37,7 +37,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 let store;
 let cookie;
 
-if (app.get('env') !== 'development') {
+if (app.get('env') === 'development') {
+  const MemoryStore = session.MemoryStore;
+  store = new MemoryStore();
+  cookie = {
+    maxAge: 3600000
+  };
+} else {
   const RedisStore = require('connect-redis')(session);
   const redisURL = url.parse(nconf.get('REDIS_URL'));
   store = new RedisStore({
@@ -48,12 +54,6 @@ if (app.get('env') !== 'development') {
   });
   cookie = {
     maxAge: 31536000000
-  };
-} else {
-  const memoryStore = session.MemoryStore;
-  store = new memoryStore();
-  cookie = {
-    maxAge: 3600000
   };
 }
 
