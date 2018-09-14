@@ -167,7 +167,7 @@ module.exports = function (app) {
       return next(new Error('No SMS body'));
     }
 
-    survey.handleIncoming(app, req, res, next);
+    survey.handleIncoming(req, res, next);
   });
 
   app.get('/notification', isAuthenticated, (req, res) => {
@@ -272,8 +272,8 @@ module.exports = function (app) {
         });
         csv += '\n';
         results.forEach(result => {
-          const line = result.answers.map((answer) => {
-            const item = answer.answer !== undefined ? answer.answer : '';
+          const line = result.answers.map(answer => {
+            const item = answer.answer === undefined ? '' : answer.answer;
             return `"${item}"`;
           });
           line.unshift(`"${result.src}"`);
@@ -298,8 +298,8 @@ module.exports = function (app) {
         let csv = 'Number,Date,Commuted?,AM Mode,PM Mode\n';
 
         results.forEach(result => {
-          const amMode = result.amMode !== undefined ? result.amMode : '';
-          const pmMode = result.pmMode !== undefined ? result.pmMode : '';
+          const amMode = result.amMode === undefined ? '' : result.amMode;
+          const pmMode = result.pmMode === undefined ? '' : result.pmMode;
 
           csv += [
             result.src,
@@ -336,7 +336,7 @@ module.exports = function (app) {
     });
     sms.save();
 
-    survey.handleIncoming(app, req, res, next);
+    survey.handleIncoming(req, res, next);
   });
 
   app.get('/api/users', isAuthenticated, (req, res) => {
