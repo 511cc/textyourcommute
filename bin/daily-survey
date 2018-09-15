@@ -7,6 +7,8 @@ const mongoose = require('mongoose');
 const argv = require('yargs').argv;
 const Twilio = require('twilio');
 
+const {Survey, DailySurvey} = require('../models/models');
+
 nconf
   .argv()
   .env()
@@ -15,12 +17,7 @@ nconf
 const client = new Twilio(nconf.get('TWILIO_SID'), nconf.get('TWILIO_AUTH_TOKEN'));
 
 mongoose.Promise = global.Promise;
-const db = mongoose.connect(nconf.get('MONGOLAB_URI'));
-
-require('../models/models').setupModels();
-
-const IntroSurvey = db.model('survey');
-const DailySurvey = db.model('daily_survey');
+mongoose.connect(nconf.get('MONGOLAB_URI'), {useNewUrlParser: true});
 
 const questions = require('../lib/questions');
 
@@ -118,7 +115,7 @@ function sendDailySurvey() {
     };
   }
 
-  IntroSurvey.find(query)
+  Survey.find(query)
   .then(users => {
     async.eachLimit(users, 5, sendCommuteQuestion, e => {
       if (e) {
