@@ -25,7 +25,13 @@ exports.DailySurvey = mongoose.model('daily_survey', new mongoose.Schema({
   date: {type: Date, index: true},
   commuted: Boolean,
   amMode: String,
-  pmMode: String
+  pmMode: String,
+  amCarpoolCount: String,
+  pmCarpoolCount: String,
+  amCarpoolRole: String,
+  pmCarpoolRole: String,
+  amRideshareOption: String,
+  pmRideshareOption: String
 }, {strict: true}));
 
 exports.User = mongoose.model('user', new mongoose.Schema({

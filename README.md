@@ -18,7 +18,7 @@ The project is written in node.js and uses mongodb to store data. It relies on t
 
     npm start
 
-### Trigger daily email
+### Trigger daily survey
 
 Morning at 17:00 UTC
     DEBUG=textyourcommute ./bin/daily-survey --type am
