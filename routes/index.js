@@ -4,6 +4,7 @@ const moment = require('moment-timezone');
 const bcrypt = require('bcrypt');
 const nconf = require('nconf');
 const twilio = require('twilio');
+const json2csv = require('json2csv').parse;
 
 const salt = bcrypt.genSaltSync(10);
 
@@ -293,24 +294,64 @@ module.exports = function (app) {
           return next(e);
         }
 
-        res.writeHead(200, {'Content-Type': 'text/csv'});
+        const opts = {
+          fields: [
+            {
+              label: 'Number',
+              value: 'src'
+            },
+            {
+              label: 'Date',
+              value: row => moment(row.date).tz('America/Los_Angeles').format('YYYY-MM-DD')
+            },
+            {
+              label: 'Commuted?',
+              value: 'commuted'
+            },
+            {
+              label: 'AM Mode',
+              value: 'amMode'
+            },
+            {
+              label: 'PM Mode',
+              value: 'pmMode'
+            },
+            {
+              label: 'AM Carpool Count',
+              value: 'amCarpoolCount'
+            },
+            {
+              label: 'PM Carpool Count',
+              value: 'pmCarpoolCount'
+            },
+            {
+              label: 'AM Carpool Role',
+              value: 'amCarpoolRole'
+            },
+            {
+              label: 'PM Carpool Role',
+              value: 'pmCarpoolRole'
+            },
+            {
+              label: 'AM Rideshare Type',
+              value: 'amRideshareOption'
+            },
+            {
+              label: 'PM Rideshare Type',
+              value: 'pmRideshareOption'
+            }
+          ]
+        };
 
-        let csv = 'Number,Date,Commuted?,AM Mode,PM Mode\n';
-
-        results.forEach(result => {
-          const amMode = result.amMode === undefined ? '' : result.amMode;
-          const pmMode = result.pmMode === undefined ? '' : result.pmMode;
-
-          csv += [
-            result.src,
-            moment(result.date).tz('America/Los_Angeles').format('YYYY-MM-DD'),
-            result.commuted,
-            `"${amMode}"`,
-            `"${pmMode}"`
-          ].join(',') + '\n';
-        });
-        res.write(csv);
-        res.end();
+        try {
+          const csv = json2csv(results, opts);
+          res.writeHead(200, {'Content-Type': 'text/csv'});
+          console.log(csv);
+          res.write(csv);
+          res.end();
+        } catch (error) {
+          next(error);
+        }
       });
   });
 
