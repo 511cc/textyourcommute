@@ -339,6 +339,14 @@ module.exports = function (app) {
             {
               label: 'PM Rideshare Type',
               value: 'pmRideshareOption'
+            },
+            {
+              label: 'AM Rideshare Count',
+              value: 'amRideshareCount'
+            },
+            {
+              label: 'PM Rideshare Count',
+              value: 'pmRideshareCount'
             }
           ]
         };

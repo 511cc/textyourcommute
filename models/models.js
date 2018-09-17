@@ -31,7 +31,9 @@ exports.DailySurvey = mongoose.model('daily_survey', new mongoose.Schema({
   amCarpoolRole: String,
   pmCarpoolRole: String,
   amRideshareOption: String,
-  pmRideshareOption: String
+  pmRideshareOption: String,
+  amRideshareCount: String,
+  pmRideshareCount: String
 }, {strict: true}));
 
 exports.User = mongoose.model('user', new mongoose.Schema({
