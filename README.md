@@ -30,6 +30,12 @@ Evening at 2:00 UTC
 
 This application was used in December, 2016 to survey drivers in Contra Costa County.
 
+## Analysis
+
+Run
+
+     python -m notebook
+
 ## License
 
 This project is licensed under GNU General Public License v3.0.
