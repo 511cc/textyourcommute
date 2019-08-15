@@ -51,7 +51,7 @@
     "connect-livereload": "^0.6.0",
     "eslint": "^5.5.0",
     "gulp-live-server": "^0.0.31",
-    "gulp-scss-lint": "^0.7.1",
+    "gulp-scss-lint": "^1.0.0",
     "xo": "^0.23.0"
   },
   "xo": {
