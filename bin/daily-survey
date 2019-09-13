@@ -30,6 +30,10 @@ function sendSMS(to, body) {
   });
 }
 
+function isWorkFromHome(response) {
+  return response.includes(7);
+}
+
 function sendCommuteQuestion(user, cb) {
   const date = moment().tz('America/Los_Angeles').startOf('day');
 
@@ -76,7 +80,7 @@ function sendCommuteQuestion(user, cb) {
         if (!dailySurvey) {
           debug(`Skipping ${user.src} because no daily_survey found`);
           cb();
-        } else if (dailySurvey.commuted && dailySurvey.amMode) {
+        } else if (dailySurvey.commuted && dailySurvey.amMode && !isWorkFromHome(dailySurvey.amMode)) {
           sendSMS(user.src, questions.dailyEvening)
           .then(() => {
             cb();
