@@ -260,6 +260,7 @@ module.exports = function (app) {
     Survey
       .find()
       .sort({$natural: -1})
+      .lean()
       .exec((e, results) => {
         if (e) {
           return next(e);
@@ -289,6 +290,7 @@ module.exports = function (app) {
     DailySurvey
       .find()
       .sort({date: -1})
+      .lean()
       .exec((e, results) => {
         if (e) {
           return next(e);
