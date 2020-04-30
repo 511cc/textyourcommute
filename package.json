@@ -24,7 +24,7 @@
     "gulp-streamify": "^1.0.2",
     "gulp-uglify": "^3.0.1",
     "gulp-util": "^3.0.8",
-    "jquery": "^3.3.1",
+    "jquery": "^3.5.0",
     "json2csv": "^4.2.1",
     "moment-timezone": "^0.5.21",
     "mongoose": "^5.2.14",
